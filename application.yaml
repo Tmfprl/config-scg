@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: SpringCloudMSAGateway
+  cloud:
+    gateway:
+      mvc:
+        routes:
+#          - id:  msVilage
+#            uri: http://localhost:8081
+#            predicates:
+#              - Path=/msVilage/**
+#          - id: msUltra
+#            uri: http://localhost:9999
+#            predicates:
+#              - Path=/msUltra/**
+
