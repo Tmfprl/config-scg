@@ -9,7 +9,8 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 public class WebMngAuthenticationApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(WebMngAuthenticationApplication.class, args);
+        SpringApplication.
+                run(WebMngAuthenticationApplication.class, args);
     }
 
 }

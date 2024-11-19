@@ -5,8 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.DynamicInsert;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -15,37 +16,37 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Table(name="gyeun_user_info", schema = "srlk")
 @ToString
 @Getter
+@DynamicInsert
 @NoArgsConstructor
-public class UserInfo {
+public class UserInfo{
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     @Column(name = "user_no")
     private Long userNo;
 
-    @Column(name = "user_password", unique = true)
+    @Column(name = "user_password", length = 100)
     private String userPassword;
 
-    @Column(name = "user_name")
+    @Column(name = "user_name", length = 50)
     private String userName;
 
     @Column(name = "user_state_code", columnDefinition = "varchar(20) default '00'")
     private String userStateCode;
 
-    @Column(name = "email_addr")
+    @Column(name = "email_addr", length = 100)
     private String emailAddr;
 
     @Column(name = "last_login_date")
     private LocalDateTime lastLoginDate;
 
-
-    @Column(name = "login_fall_count", nullable = false, columnDefinition = "smallint default 0")
+    @Column(name = "login_fall_count", columnDefinition = "smallint default 0")
     private Integer loginFailCount;
 
     @Column(name = "refresh_token")
     private String refreshToken;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", unique = true)
     private String userId;
 
     @Builder
@@ -57,6 +58,10 @@ public class UserInfo {
         this.emailAddr = email;
         this.userPassword = userPassword;
         this.userStateCode = userStateCode;
+    }
+
+    public void encodePassword(PasswordEncoder encoder) {
+        this.userPassword = encoder.encode(this.userPassword);
     }
 
     /**
@@ -92,5 +97,10 @@ public class UserInfo {
         this.loginFailCount = 0;
         this.lastLoginDate = LocalDateTime.now();
         return this;
+    }
+
+    public String getStateKey(String userStateCode) {
+        UserStateCode usc = UserStateCode.findByKey(userStateCode);
+        return usc.getKey();
     }
 }
