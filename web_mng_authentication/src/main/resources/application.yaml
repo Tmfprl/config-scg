@@ -1,9 +1,40 @@
 server:
   port: 8083
 
+# 2시간(7,200,000), 1일(86,400,000) jwt token
+token:
+  expiration_time: 7200000
+  refresh_time: 86400000
+  secret: 'token_secret'
+
 spring:
   application:
     name: web_mng_authentication
+  datasource:
+    hikari:
+      auto-commit: false
+      connection-test-query: select 1
+      maximum-pool-size: 10
+      pool-name: MyHikariCP
+      driver-class-name: org.postgresql.Driver
+      jdbc-url: jdbc:postgresql://211.189.132.159:15433/test_srlk3
+      username: postgres
+      password: postgres
+
+  jpa:
+    show_sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_batch_fetch_size: 100
+
+    hibernate:
+      ddl-auto: none
+
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: trace
 
 eureka:
   client:
