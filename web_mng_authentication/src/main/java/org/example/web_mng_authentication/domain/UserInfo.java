@@ -103,4 +103,5 @@ public class UserInfo{
         UserStateCode usc = UserStateCode.findByKey(userStateCode);
         return usc.getKey();
     }
+
 }
