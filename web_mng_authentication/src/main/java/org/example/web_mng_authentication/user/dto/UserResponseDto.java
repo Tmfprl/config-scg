@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.example.web_mng_authentication.domain.UserInfo;
-import org.example.web_mng_authentication.domain.UserStateCode;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;

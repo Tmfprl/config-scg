@@ -6,7 +6,11 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.example.web_mng_authentication.domain.UserInfo;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+import static java.time.LocalDateTime.now;
 
 @Getter
 @NoArgsConstructor
@@ -17,14 +21,16 @@ public class UserInfoDto {
     private String password;
     private String email;
     private String userStateCode;
+    private LocalDateTime createTime;
 
     @Builder
-    public UserInfoDto(String userId, String userName, String password, String email, String userStateCode) {
+    public UserInfoDto(String userId, String userName, String password, String email, String userStateCode, LocalDateTime createTime) {
         this.userId = userId;
         this.userName = userName;
         this.password = password;
         this.email = email;
         this.userStateCode = userStateCode;
+        this.createTime = createTime;
     }
 
     public UserInfo toEntity(BCryptPasswordEncoder encoder) throws Exception {
@@ -34,6 +40,7 @@ public class UserInfoDto {
                 .email(email)
                 .userPassword(encoder.encode(password)) // 패스워드 인코딩
                 .userStateCode(userStateCode)
+                .createTime(now())
                 .build();
     }
 }

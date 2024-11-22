@@ -14,12 +14,10 @@ import org.example.web_mng_authentication.user.dto.UserResponseAllDto;
 import org.example.web_mng_authentication.user.service.UserApiService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component

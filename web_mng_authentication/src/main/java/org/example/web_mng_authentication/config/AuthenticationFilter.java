@@ -19,18 +19,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.util.StringUtils.hasLength;
 
@@ -40,8 +34,17 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final TokenProvider tokenProvider;
     private final UserApiService userService;
     private final CutomAuthenticationProvider cutomAuthenticationProvider;
-    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    BCryptPasswordEncoder passwordEncoder;
 
+    // error! : Password Not found
+    // pw를 맞게 입력하여도 pw를 찾을 수 없다는 에러가 발생한다. bcrypt 암호화로 바꾼 뒤로 match가 되지 않는다.
+    // 바꾼이유는 인증시에 passwoedencodre 방식을 사용해서는 안된다고 하길래 사용한건데 로그인이 되질 않는다.
+    // 하지만 예전에 passwordencode 방식을 사용하여 저장된 사용자 정보를 통해서는 로그인이 잘된다.
+    // 저장된 암호문을 bcrypt 형식으로 인식하지 못하는건...이건 상관 없을 듯하다. 그냥 입력받은 평문을 암호화시켜서 db에 저장된 암호문과 비교하는건데
+    // 단방향 암호라 복호화 할 일도 없는데 왜지 왜왜왜지 왤까 이유가 뭘까
+    // 암호화된 형식을 보면 차이가 없다. 뭐지
+    // id3 , pass -> 된다__암호화된 pw에 약간의 차이가 있지만 이게 문제일까?
+    // userId3, pass -> 안된다
     public AuthenticationFilter(AuthenticationManager authenticationManager, TokenProvider tokenProvider, UserApiService userService,
                                 BCryptPasswordEncoder passwordEncoder, CutomAuthenticationProvider cutomAuthenticationProvider) {
         this.passwordEncoder = passwordEncoder;
@@ -53,7 +56,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
 //    @Bean
 //    public AuthenticationProvider authenticationProvider() {
-////        return new AuthenticationProvider(, passwordEncoder); // 모르갰다 유저가 입력한 데이터를 가지고 저장소에 데이터와 비교해서 가져오는게 user details service 라는데 잘 모르겠다
+////        return new AuthenticationProvider(, passwordEncoder);
 //        return new UsernamePasswordAuthenticationToken()
 //    }
 

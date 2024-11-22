@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -53,15 +54,20 @@ public class UserInfo implements UserDetails {
     @Column(name = "user_id", unique = true)
     private String userId;
 
+
+    @Column(name = "creates_date")
+    private LocalDateTime createTime;
+
     @Builder
     public UserInfo (Long userNo, String userId, String userName, String email,
-                     String userPassword, String userStateCode) {
+                     String userPassword, String userStateCode, LocalDateTime createTime) {
         this.userNo = userNo;
         this.userId = userId;
         this.userName = userName;
         this.emailAddr = email;
         this.userPassword = userPassword;
         this.userStateCode = userStateCode;
+        this.createTime = createTime;
     }
 
     /**
