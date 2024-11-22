@@ -22,14 +22,14 @@ public class UserApiController {
     private final UserApiService userApiService;
     private final TokenProvider tokenProvider;
 
-    @PostMapping("/user/controller/saveUser")
+    @PostMapping("/user/saveUser")
     public ResponseEntity<Long> saveUser(@RequestBody UserInfoDto userInfoDto) throws Exception {
         log.info("save user information {}", userInfoDto.toString());
         return ResponseEntity.ok()
-                .body(userApiService.singIn(userInfoDto));
+                .body(userApiService.signIn(userInfoDto));
     }
 
-    @GetMapping("/user/controller/getUser/{userId}")
+    @GetMapping("/login/getUser/{userId}")
     public ResponseEntity<Page<UserResponseDto>> getUser(@PathVariable("userId") String userId) throws Exception {
         log.info("get user information {}", userId);
         Pageable pageable = PageRequest.of(0, 50, Sort.by("userId"));
@@ -37,7 +37,7 @@ public class UserApiController {
                 .body(userApiService.findById(userId, pageable));
     }
 
-    @GetMapping("/user/controller/getUser/{userId}/{userName}/{userEmail}")
+    @GetMapping("/login/getUser/{userId}/{userName}/{userEmail}")
     public void createToken(@PathVariable("userId") String userId,
                                               @PathVariable("userName") String userName,
                                               @PathVariable("userEmail") String userEmail) throws Exception {

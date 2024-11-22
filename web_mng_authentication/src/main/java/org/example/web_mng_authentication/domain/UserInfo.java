@@ -6,9 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.DynamicInsert;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -18,7 +22,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Getter
 @DynamicInsert
 @NoArgsConstructor
-public class UserInfo{
+public class UserInfo implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -40,7 +44,7 @@ public class UserInfo{
     @Column(name = "last_login_date")
     private LocalDateTime lastLoginDate;
 
-    @Column(name = "login_fall_count", columnDefinition = "smallint default 0")
+    @Column(name = "login_fail_count", columnDefinition = "smallint default 0")
     private Integer loginFailCount;
 
     @Column(name = "refresh_token")
@@ -58,10 +62,6 @@ public class UserInfo{
         this.emailAddr = email;
         this.userPassword = userPassword;
         this.userStateCode = userStateCode;
-    }
-
-    public void encodePassword(PasswordEncoder encoder) {
-        this.userPassword = encoder.encode(this.userPassword);
     }
 
     /**
@@ -104,4 +104,23 @@ public class UserInfo{
         return usc.getKey();
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public String getPassword() {
+        return "";
+    }
+
+    @Override
+    public String getUsername() {
+        return userId;
+    }
+
+    // getter
+    public String getUserName() {
+        return userId;
+    }
 }

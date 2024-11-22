@@ -77,10 +77,6 @@ public class TokenProvider {
                 .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(TOKEN_EXPIRATION_TIME)))
                 // sing key를 지정(jwt 생성 라이브러리인 jjwt가 지정된 key에 허용된 가장 안전한 알고리즘은 결정하게 해준다.)
                 .signWith(SignatureAlgorithm.HS512, TOKEN_SECRET)
-                // 토큰 유효기간
-                .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(TOKEN_EXPIRATION_TIME)))
-                // sing key를 지정(jwt 생성 라이브러리인 jjwt가 지정된 key에 허용된 가장 안전한 알고리즘은 결정하게 해준다.)
-                .signWith(SignatureAlgorithm.HS512, TOKEN_SECRET)
                 .compact();
     }
 

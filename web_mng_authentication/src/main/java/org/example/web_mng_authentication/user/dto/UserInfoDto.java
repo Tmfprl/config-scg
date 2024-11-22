@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.example.web_mng_authentication.domain.UserInfo;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
@@ -26,7 +27,7 @@ public class UserInfoDto {
         this.userStateCode = userStateCode;
     }
 
-    public UserInfo toEntity(PasswordEncoder encoder) throws Exception {
+    public UserInfo toEntity(BCryptPasswordEncoder encoder) throws Exception {
         return UserInfo.builder()
                 .userName(userName)
                 .userId(userId)
