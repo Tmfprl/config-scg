@@ -2,7 +2,7 @@ package org.example.web_mng_authentication.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.web_mng_authentication.config.TokenProvider;
+import org.example.web_mng_authentication.jwt.TokenProvider;
 import org.example.web_mng_authentication.user.dto.UserInfoDto;
 import org.example.web_mng_authentication.user.dto.UserResponseDto;
 import org.example.web_mng_authentication.user.service.UserApiService;
@@ -24,6 +24,9 @@ public class UserApiController {
     @PostMapping("/user/saveUser")
     public ResponseEntity<Long> saveUser(@RequestBody UserInfoDto userInfoDto) throws Exception {
         log.info("save user information {}", userInfoDto.toString());
+
+        String token = tokenProvider.createAccessToken(userInfoDto.getUserId(), userInfoDto.getUserName(), userInfoDto.getEmail());
+        log.info("created token {}", token);
         return ResponseEntity.ok()
                 .body(userApiService.signIn(userInfoDto));
     }

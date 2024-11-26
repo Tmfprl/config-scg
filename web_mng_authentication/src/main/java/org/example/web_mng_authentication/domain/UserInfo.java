@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @ToString
 @Getter
 @DynamicInsert
+@DynamicUpdate
 @NoArgsConstructor
 public class UserInfo implements UserDetails {
 
@@ -60,7 +62,7 @@ public class UserInfo implements UserDetails {
 
     @Builder
     public UserInfo (Long userNo, String userId, String userName, String email,
-                     String userPassword, String userStateCode, LocalDateTime createTime) {
+                     String userPassword, String userStateCode, LocalDateTime createTime, LocalDateTime lastLoginDate, Integer loginFailCount, String refreshToken) {
         this.userNo = userNo;
         this.userId = userId;
         this.userName = userName;
@@ -68,6 +70,7 @@ public class UserInfo implements UserDetails {
         this.userPassword = userPassword;
         this.userStateCode = userStateCode;
         this.createTime = createTime;
+        this.lastLoginDate = lastLoginDate;
     }
 
     /**
@@ -86,12 +89,13 @@ public class UserInfo implements UserDetails {
      *
      * @return User 사용자 엔티티
      */
-    public UserInfo failLogin() {
+    public void failLogin() {
         this.loginFailCount = loginFailCount + 1;
         if (this.loginFailCount >= 5) {
             this.userStateCode = UserStateCode.HALT.getKey();
+        } else {
+            System.out.println("login fail count : "+loginFailCount);
         }
-        return this;
     }
 
     /**
@@ -110,6 +114,7 @@ public class UserInfo implements UserDetails {
         return usc.getKey();
     }
 
+    // user 권한 정보 (사용 안함)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

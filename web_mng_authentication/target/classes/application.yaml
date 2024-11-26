@@ -5,7 +5,9 @@ server:
 token:
   expiration_time: 7200000
   refresh_time: 86400000
-  secret: 'token_secret'
+#  터미널에서 'openssl rand -hex 32' 명령어로 생성한 암호 키
+  secret: 4d516a02898d2166e5aec5d66037f196d4317ffa175a2b737e0fb535ecd9fcc6
+#  secret: 'token_secret'
 
 spring:
   application:

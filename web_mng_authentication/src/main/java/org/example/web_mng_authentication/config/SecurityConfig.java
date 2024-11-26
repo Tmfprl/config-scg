@@ -2,7 +2,6 @@ package org.example.web_mng_authentication.config;
 
 import lombok.RequiredArgsConstructor;
 import org.example.web_mng_authentication.user.service.CustomAuthSuccessHandler;
-import org.example.web_mng_authentication.user.service.UserApiService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +9,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -19,12 +17,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity (debug = true) // request가 올 떄마다 어떤 filter를 사용하고 있는지 출력을 해준다.
 @EnableMethodSecurity
 public class SecurityConfig {
-
-    private final TokenProvider tokenProvider;
-    private final UserApiService userApiService;
-    private final UserPasswordEncoder passwordEncoder;
-    private final UserDetailsService userDetailsService;
-
 
     @Value("${token.secret}")
     private String TOKEN_SECRET;
@@ -40,8 +32,9 @@ public class SecurityConfig {
                 // 요청에 대한 접근 권한을 설정합니다.
                 .authorizeRequests(authorize -> authorize
                         // /auth/signIn 경로에 대한 접근을 허용합니다. 이 경로는 인증 없이 접근할 수 있습니다.
-                        .requestMatchers("/login").permitAll()
-                        .requestMatchers("/login/**").authenticated()
+                        .requestMatchers("/login").permitAll()  // 모든접근허용
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/login/**").authenticated()   // 제한된 접근
                         .requestMatchers("/user/**").permitAll()
                         // 그 외의 모든 요청은 인증이 필요합니다.
                         .anyRequest().permitAll()
@@ -50,11 +43,11 @@ public class SecurityConfig {
 //                exceptionConfig
 //                        .authenticationEntryPoint(unauthorizedEntryPoint)
 //                        .accessDeniedHandler(accessDeniedHandler)
-//        ) // 401 403 관련 예외처리
-                .formLogin((formLogin) -> formLogin.successHandler(customAuthSuccessHandler)
-//                        withDefaults()
+//        ) // 401 403 관련 예외처리_나중에 예외처리할때 한번에 설정
+                .formLogin(
+                        (formLogin) -> formLogin
+                                .successHandler(customAuthSuccessHandler)
                 )
-
                 .logout((s) -> s.logoutUrl("/logout").logoutSuccessUrl("/login").permitAll())
 
                 // 세션 관리 정책을 정의합니다. 여기서는 세션을 사용하지 않도록 STATELESS로 설정합니다. (세션이나 쿠키를 사용한 인증이 아닌 토큰을 사용한 인증이기 때문에)

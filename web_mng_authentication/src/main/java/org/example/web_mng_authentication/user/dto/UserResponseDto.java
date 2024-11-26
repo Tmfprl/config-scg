@@ -19,8 +19,6 @@ public class UserResponseDto {
     private String userId;
     private String userName;
     private String email;
-    private static String userStateCode;
-    private String userStateName;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime lastLoginDate;
 
@@ -31,7 +29,6 @@ public class UserResponseDto {
         this.email = email;
         this.lastLoginDate = lastLoginDate;
     }
-
 
     public Page<UserResponseDto> toPage (Page<UserInfo> entity) {
         Page<UserResponseDto> dto = entity.map(m -> toDto(m));

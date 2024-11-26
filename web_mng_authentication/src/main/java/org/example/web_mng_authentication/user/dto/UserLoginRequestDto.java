@@ -3,9 +3,11 @@ package org.example.web_mng_authentication.user.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Getter
 @NoArgsConstructor
+@Repository
 public class UserLoginRequestDto {
 //    private final PasswordEncoder = passwordEncoder;
 
@@ -18,11 +20,6 @@ public class UserLoginRequestDto {
      * 비밀번호
      */
     private String password;
-
-    /**
-     * 공급    자
-     */
-    private String provider;
 
     /**
      * 토큰
@@ -40,14 +37,12 @@ public class UserLoginRequestDto {
      *
      * @param userId    이메일
      * @param password 비밀번호
-     * @param provider 공급자
      * @param token    토큰
      */
     @Builder
-    public UserLoginRequestDto(String userId, String password, String provider, String token, String name) {
+    public UserLoginRequestDto(String userId, String password, String token, String name) {
         this.userId = userId;
         this.password = password;
-        this.provider = provider;
         this.token = token;
         this.name = name;
     }

@@ -1,8 +1,6 @@
-package org.example.web_mng_authentication.config;
+package org.example.web_mng_authentication.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +16,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+
+import static java.time.LocalDateTime.now;
 
 @Slf4j
 @Component
@@ -38,14 +38,13 @@ public class TokenProvider {
 
     final String TOKEN_ACCESS_KEY = "access-token";
     final String TOKEN_CLAIM_USER_NAME = "userName";
-    final String TOKEN_CLAIM_EMAIL = "email";
 
-    public void createTokenAndAddHeader(HttpServletRequest request, HttpServletResponse response,
-                                        FilterChain chain, Authentication authResult) {
+    public void createTokenAndAddHeader(HttpServletResponse response, Authentication authResult) {
         // 로그인 성공 후 토큰 처리
         String userId = authResult.getName();
         String userName = "";
         String email = "";
+
         try {
             UserResponseAllDto user = userService.findByUserId(userId);
             userName = user.getUserName();
@@ -57,8 +56,12 @@ public class TokenProvider {
 
         // JWT Access 토큰 생성
         String accessToken = createAccessToken(userId, userName, email);
+        log.info("access token : {}", accessToken);
+
         String refreshToken = createRefreshToken();
         userService.updateRefreshToken(userId, refreshToken);
+
+        // 토큰을 헤더에 추가
         response.addHeader(TOKEN_ACCESS_KEY, accessToken);
     }
 
@@ -70,10 +73,9 @@ public class TokenProvider {
         return Jwts.builder()
                 .setSubject(userId)
                 .claim(TOKEN_CLAIM_USER_NAME, userName)
-                .claim(TOKEN_CLAIM_EMAIL, email)
                 // 토큰 유효기간
                 .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(TOKEN_EXPIRATION_TIME)))
-                // sing key를 지정(jwt 생성 라이브러리인 jjwt가 지정된 key에 허용된 가장 안전한 알고리즘은 결정하게 해준다.)
+                // sign key를 지정(jwt 생성 라이브러리인 jjwt가 지정된 key에 허용된 가장 안전한 알고리즘을 결정하게 해준다.)
                 .signWith(SignatureAlgorithm.HS512, TOKEN_SECRET)
                 .compact();
     }
@@ -112,5 +114,4 @@ public class TokenProvider {
 
         return user.getRefreshToken();
     }
-
 }

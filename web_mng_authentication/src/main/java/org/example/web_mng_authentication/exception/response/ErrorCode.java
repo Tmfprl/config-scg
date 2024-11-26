@@ -10,7 +10,9 @@ public enum ErrorCode {
     USER_NOT_FOUND("404", "USER_001", "not found user"),
     WRONG_INPUT("400", "INPUT_ERROR", "wrong input"),
     SERVER_ERROR("500", "SERVER_ERROR", "server error"),
-    MISSING_HEADER("400", "BAD_REQUEST", "not found header");
+    MISSING_HEADER("400", "BAD_REQUEST", "not found header"),
+    WRONG_PASSWORD("404", "USER_002", "password not match")
+    ;
 
     private final String status;
     private final String message;

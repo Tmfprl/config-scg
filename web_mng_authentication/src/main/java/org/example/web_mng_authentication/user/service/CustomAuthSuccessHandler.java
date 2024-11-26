@@ -1,42 +1,44 @@
 package org.example.web_mng_authentication.user.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
+import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.web_mng_authentication.user.dto.UserLoginRequestDto;
+import org.example.web_mng_authentication.domain.UserInfo;
+import org.example.web_mng_authentication.domain.UserRepository;
+import org.example.web_mng_authentication.jwt.TokenProvider;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class CustomAuthSuccessHandler implements AuthenticationSuccessHandler {
+
+    private final UserRepository userRepository;
     private final UserApiService userApiService;
+    private final TokenProvider tokenProvider;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
-            throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        UserDetails userDetails = userApiService.loadUserByUsername(authentication.getName().toString());
+        String userPw = userDetails.getPassword();
+        Optional<UserInfo> user = userRepository.findByUserId(userDetails.getUsername().toString());
 
-        log.info("login success");
-
-        // 사용자가 입력한 인증정보 받기, POST method 값이기 때문에 input stream으로 받았다.
-//        UserLoginRequestDto creds;
-//
-//        try {
-//            creds = new ObjectMapper().readValue(request.getInputStream(), UserLoginRequestDto.class);
-//            log.info("login user : {}", creds.getUserId());
-//        } catch (IOException e) {
-//            log.error(e.getLocalizedMessage());
-//            throw new RuntimeException(e);
-//        }
-//        userApiService.loginCallback(creds.getUserId(), true, "");
-        log.info("============onAuthenticationSuccess============");
+        System.out.println("user login info id : "+ userDetails.getUsername() + ", pw : " + userPw);
+        if(user.isPresent()) {
+            log.info("login success");
+            userApiService.loginCallback(userDetails.getUsername(), true, "");
+            tokenProvider.createTokenAndAddHeader(response, authentication);
+        } else {
+            log.info("login failed");
+        }
     }
 
 }

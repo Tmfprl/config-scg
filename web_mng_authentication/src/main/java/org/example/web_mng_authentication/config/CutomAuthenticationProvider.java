@@ -1,6 +1,7 @@
 package org.example.web_mng_authentication.config;
 
 import lombok.RequiredArgsConstructor;
+import org.example.web_mng_authentication.user.service.UserApiService;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -9,15 +10,14 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class CutomAuthenticationProvider implements AuthenticationProvider {
     private final UserDetailsService userDetailsService;
-    private final PasswordEncoder passwordEncoder;
     BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+    private final UserApiService userApiService;
 
     /** 인증 정보 생성
      *
@@ -32,14 +32,20 @@ public class CutomAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();
         String password = authentication.getCredentials().toString();
+        System.out.println(username);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         // spring security의 규정인지 바로 인코딩을 적용 할 수 없다.
         if (!bCryptPasswordEncoder.matches(password, userDetails.getPassword())) {
-            // password에 null이 들어갈 수 없다.
-            return new UsernamePasswordAuthenticationToken(username, password, null);
-        } else {
+            // 로그인 실패 후처리
+            userApiService.loginCallback(username, false, "");
             throw new BadCredentialsException("Password Not Match");
+        } else {
+            // 로그인 성공 후처리
+            userApiService.loginCallback(username, true, "");
+            // password에 null이 들어갈 수 없다.
+            // 인증된 객체를 생성
+            return new UsernamePasswordAuthenticationToken(username, password, null);
         }
     }
 
