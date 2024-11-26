@@ -1,23 +1,24 @@
 package org.example.web_mng_authentication.jwt;
 
 import io.jsonwebtoken.*;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.web_mng_authentication.domain.UserInfo;
 import org.example.web_mng_authentication.domain.UserRepository;
+import org.example.web_mng_authentication.exception.ServiceCoustomException;
+import org.example.web_mng_authentication.exception.response.ErrorCode;
 import org.example.web_mng_authentication.user.dto.UserResponseAllDto;
 import org.example.web_mng_authentication.user.service.UserApiService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.Date;
-
-import static java.time.LocalDateTime.now;
 
 @Slf4j
 @Component
@@ -39,7 +40,7 @@ public class TokenProvider {
     final String TOKEN_ACCESS_KEY = "access-token";
     final String TOKEN_CLAIM_USER_NAME = "userName";
 
-    public void createTokenAndAddHeader(HttpServletResponse response, Authentication authResult) {
+    public void createTokenAndAddHeader(HttpServletResponse response, Authentication authResult) throws IOException {
         // 로그인 성공 후 토큰 처리
         String userId = authResult.getName();
         String userName = "";
@@ -63,6 +64,7 @@ public class TokenProvider {
 
         // 토큰을 헤더에 추가
         response.addHeader(TOKEN_ACCESS_KEY, accessToken);
+        response.sendRedirect("/getUser/userId=" + authResult.getName());
     }
 
 
@@ -113,5 +115,33 @@ public class TokenProvider {
         user.updateRefreshToken(updateRefreshToken);
 
         return user.getRefreshToken();
+    }
+
+    /**
+     * 토큰을 검증
+     * @param token
+     * @return
+     */
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(TOKEN_SECRET).parseClaimsJws(token);
+            log.info("token validate");
+            return true;
+        } catch (JwtException e) {
+            // MalformedJwtException | ExpiredJwtException | IllegalArgumentException
+            throw new ServiceCoustomException(ErrorCode.TOKEN_EXPIRED);
+        }
+    }
+
+    /**
+     * 토큰으로부터 클레임을 만들고, 이를 통해 User 객체를 생성하여 Authentication 객체를 반환
+     * @param token
+     * @return
+     */
+    public Authentication getAuthentication(String token) {
+        String username = Jwts.parser().setSigningKey(TOKEN_SECRET).parseClaimsJws(token).getBody().getSubject();
+        UserDetails userDetails = userService.loadUserByUsername(username);
+
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 }

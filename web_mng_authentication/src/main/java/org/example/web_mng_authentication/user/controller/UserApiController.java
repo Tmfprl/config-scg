@@ -31,7 +31,7 @@ public class UserApiController {
                 .body(userApiService.signIn(userInfoDto));
     }
 
-    @GetMapping("/login/getUser/{userId}")
+    @GetMapping("/getUser/{userId}")
     public ResponseEntity<Page<UserResponseDto>> getUser(@PathVariable("userId") String userId) throws Exception {
         log.info("get user information {}", userId);
         Pageable pageable = PageRequest.of(0, 50, Sort.by("userId"));
@@ -49,5 +49,7 @@ public class UserApiController {
         String jwtToken = tokenProvider.createAccessToken(userId, userName, userEmail);
         log.info("createToken userId : {}", jwtToken);
     }
+
+//    @GetMapping("/")
 
 }

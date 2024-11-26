@@ -73,41 +73,9 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         return getAuthenticationManager().authenticate(upat);
     }
 
-//    user api service 에서 처리 중이다.
-//    @Override
-//    public void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-//
-//        log.info("=============================== successful authentication =================================");// 토큰 생성 및 response header add
-//        tokenProvider.createTokenAndAddHeader(request, response, chain, authResult);
-//        // 로그인 성공 후처리
-//        userService.loginCallback(authResult.getName(), true, "");
-//    }
-//
-//    @Override
-//    public void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-//        String failContent = failed.getMessage();
-//        if (failed instanceof InternalAuthenticationServiceException) {
-//            log.info("{} 해당 사용자가 없습니다", request.getAttribute("userId"));
-//        } else if (failed instanceof BadCredentialsException) {
-//            failContent = "패스워드 인증에 실패하였습니다. " + failContent;
-//        }
-//        response.setStatus(HttpStatus.OK.value());
-//
-//        String error = failed.getMessage();
-//
-//        if(error.equals("Bad credentials")) {
-//            error = "-1";
-//        }
-//
-//        response.setHeader("error", error);
-//
-//        // 로그인 실패 처리
-//        String userId = (String) request.getAttribute("userId");
-//        userService.loginCallback(userId, false, failContent);
-//    }
-
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) {
+        log.info("doFilter run");
         try {
             HttpServletRequest httpRequest = (HttpServletRequest) request;
             HttpServletResponse httpResponse = (HttpServletResponse) response;

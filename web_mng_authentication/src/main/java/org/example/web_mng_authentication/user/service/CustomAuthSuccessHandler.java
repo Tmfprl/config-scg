@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -26,7 +27,7 @@ public class CustomAuthSuccessHandler implements AuthenticationSuccessHandler {
     private final TokenProvider tokenProvider;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         UserDetails userDetails = userApiService.loadUserByUsername(authentication.getName().toString());
         String userPw = userDetails.getPassword();
         Optional<UserInfo> user = userRepository.findByUserId(userDetails.getUsername().toString());
@@ -36,6 +37,7 @@ public class CustomAuthSuccessHandler implements AuthenticationSuccessHandler {
             log.info("login success");
             userApiService.loginCallback(userDetails.getUsername(), true, "");
             tokenProvider.createTokenAndAddHeader(response, authentication);
+//            System.out.println(response.getHeader("access-token"));
         } else {
             log.info("login failed");
         }

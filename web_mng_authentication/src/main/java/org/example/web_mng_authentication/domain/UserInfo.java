@@ -132,6 +132,6 @@ public class UserInfo implements UserDetails {
 
     // getter
     public String getUserName() {
-        return userId;
+        return userName;
     }
 }

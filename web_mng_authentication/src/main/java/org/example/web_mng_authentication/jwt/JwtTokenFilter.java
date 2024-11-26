@@ -5,33 +5,49 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.example.web_mng_authentication.config.AuthenticationFilter;
+import org.example.web_mng_authentication.exception.ServiceCoustomException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
-//    public static final String AUTHORIZATION_HEADER = "Authorization";
-////    Bearer : JWT 혹은 OAuth에 대한 토큰을 사용한다. (RFC 6750)
+    final String AUTHORIZATION_HEADER = "access-token";
+//    Bearer : JWT 혹은 OAuth에 대한 토큰을 사용한다. (RFC 6750)
 //    public static final String BEARER_PREFIX = "Bearer ";
-//
-//    private final TokenProvider tokenProvider;
-//
-//
+    private final TokenProvider tokenProvider;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-//        // 1. Request Header 에서 토큰을 꺼냄
-//        String jwt = resolveToken(request);
-//
+         // 1. Request Header 에서 토큰을 꺼냄
+        String jwt = response.getHeader(AUTHORIZATION_HEADER);
+        log.info("response.getHeader(AUTHORIZATION_HEADER) : {}", jwt);
+
+        try {
+            if (jwt != null && tokenProvider.validateToken(jwt)) {
+                Authentication auth = tokenProvider.getAuthentication(jwt);
+                // 정상 토큰이면 토큰을 통해 생성한 Authentication 객체를 SecurityContext에 저장
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+        } catch (ServiceCoustomException e) {
+            SecurityContextHolder.clearContext();
+            response.sendError(404, e.getMessage());
+            return;
+        }
+        filterChain.doFilter(request, response);
+
+
 //        // 2. validateToken 으로 토큰 유효성 검사
 //        // 정상 토큰이면 해당 토큰으로 Authentication 을 가져와서 SecurityContext 에 저장
 //        if (StringUtils.hasText(jwt) && tokenProvider.validateToken토큰유효성검사_이건게이트웨이에서?(jwt)) {
 //            Authentication authentication = tokenProvider.getToken메소드만들어서가져오기(jwt);
 //            SecurityContextHolder.getContext().setAuthentication(authentication);
 //        }
-//
-//        // 토큰 유효성 검사를 해보려고 했는데 잘안되서 회사 프로젝트를 확인해보니 게이트웨이 측에서 유효성을 검사함
-//        // 전체적으로 모르는 패키지이고 어렵다 , 처음보는 타입(Mono?)
 //
 //        filterChain.doFilter(request, response);
 //    }
@@ -45,17 +61,3 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 //
     }
 }
-
-/**
- *
- * 여기에 있어야 하는거 :
- *  access token provider
- *  refresh token provider
- *  add token in header
- *  response to gateway
- *
- * 저기에 있어야 하는거 :
- *  validation token
- *  ....
- *
- */

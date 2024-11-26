@@ -11,7 +11,8 @@ public enum ErrorCode {
     WRONG_INPUT("400", "INPUT_ERROR", "wrong input"),
     SERVER_ERROR("500", "SERVER_ERROR", "server error"),
     MISSING_HEADER("400", "BAD_REQUEST", "not found header"),
-    WRONG_PASSWORD("404", "USER_002", "password not match")
+    WRONG_PASSWORD("404", "USER_002", "password not match"),
+    TOKEN_EXPIRED("401", "TOKEN_EXPIRED", "token expired"),
     ;
 
     private final String status;

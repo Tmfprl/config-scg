@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+// singleton 빈 으로 등록
 @Configuration
 public class RestTemplateConfig {
 
