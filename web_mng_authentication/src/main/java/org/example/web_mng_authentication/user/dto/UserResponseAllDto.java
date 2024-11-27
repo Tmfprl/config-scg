@@ -18,7 +18,7 @@ public class UserResponseAllDto {
      *
      * @param entity
      */
-    public UserResponseAllDto(UserInfo entity) throws Exception {
+    public UserResponseAllDto(UserInfo entity){
         this.userId = entity.getUserId();
         this.userName = entity.getUserName();
         this.email = entity.getEmailAddr();

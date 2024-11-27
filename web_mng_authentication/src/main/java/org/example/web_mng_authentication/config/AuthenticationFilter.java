@@ -8,6 +8,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.web_mng_authentication.jwt.TokenProvider;
 import org.example.web_mng_authentication.user.dto.UserLoginRequestDto;
@@ -22,24 +23,23 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 import static org.springframework.util.StringUtils.hasLength;
 
+@RequiredArgsConstructor
 @Slf4j
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final TokenProvider tokenProvider;
-    private final UserApiService userService;
     private final CutomAuthenticationProvider cutomAuthenticationProvider;
+    final String TOKEN_ACCESS_KEY = "access-token";
 
-    public AuthenticationFilter(AuthenticationManager authenticationManager, TokenProvider tokenProvider, UserApiService userService,
-                                CutomAuthenticationProvider cutomAuthenticationProvider) {
+    public AuthenticationFilter(CutomAuthenticationProvider cutomAuthenticationProvider, TokenProvider tokenProvider) {
         this.cutomAuthenticationProvider = cutomAuthenticationProvider;
-        super.setAuthenticationManager(authenticationManager);
         this.tokenProvider = tokenProvider;
-        this.userService = userService;
     }
 
     @Bean
@@ -55,45 +55,76 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
+        String username = obtainUsername(request);
+        String password = obtainPassword(request);
         // 사용자가 입력한 인증정보 받기, POST method 값이기 때문에 input stream으로 받았다.
         UserLoginRequestDto creds;
         try {
-            creds = new ObjectMapper().readValue(request.getInputStream(), UserLoginRequestDto.class);
-        } catch (IOException e) {
+//            creds = new ObjectMapper().readValue(request.getInputStream(), UserLoginRequestDto.class);
+            // 공백제거
+            username = username.trim();
+            log.info("authenticate run user name : {} ", username);
+            // 호출 + 초기화
+
+        } catch (RuntimeException e) {
             log.error(e.getLocalizedMessage());
-            throw new RuntimeException(e);
         }
-        log.info("authenticate run");
-        // 호출 + 초기화
-        UsernamePasswordAuthenticationToken upat = new UsernamePasswordAuthenticationToken(
-                creds.getUserId(),
-                creds.getPassword());
+
+        UsernamePasswordAuthenticationToken upat = new UsernamePasswordAuthenticationToken(username, password);
+
+        Authentication auth = cutomAuthenticationProvider.authenticate(upat);
 
         // 유저 로그인 정보를 받아오 인증정보를 리턴한다.
-        return getAuthenticationManager().authenticate(upat);
+        return auth;
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
         log.info("doFilter run");
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+//        UserLoginRequestDto userInput = new ObjectMapper().readValue(request.getInputStream(), UserLoginRequestDto.class);
+//        System.out.println(userInput);
+
+        if (!requiresAuthentication(httpRequest, httpResponse)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        Authentication authentication;
+
         try {
-            HttpServletRequest httpRequest = (HttpServletRequest) request;
-            HttpServletResponse httpResponse = (HttpServletResponse) response;
-
-            String token = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-
-            if (!hasLength(token) || "undefined".equals(token)) {
-                super.doFilter(request, httpResponse, chain);
-            } else {
-                // 토큰 유효성 검사는 API Gateway ReactiveAuthorization 클래스에서 미리 처리된다.
-                Claims claims = tokenProvider.getClaimsFromToken(token);
-                chain.doFilter(request, httpResponse);
+            authentication = attemptAuthentication(httpRequest, httpResponse);
+            if(authentication == null){
+                return;
             }
-        } catch (ServletException | IOException e) {
+            cutomAuthenticationProvider.authenticate(authentication);
+
+
+//            String token = httpResponse.getHeader("access-token");
+//            System.out.println("token : " + token);
+//
+////            if (!hasLength(token) || "undefined".equals(token)) {
+////                super.doFilter(request, httpResponse, chain);
+//            if (!tokenProvider.validateToken(token)) {
+//                // 토큰 유효성 검사는 API Gateway ReactiveAuthorization 클래스에서 미리 처리된다.
+////                Claims claims = tokenProvider.getClaimsFromToken(token);
+//                chain.doFilter(request, response);
+//            } else  {
+//                log.info("validate token");
+//                Authentication authenticationResult = attemptAuthentication(httpRequest, httpResponse);
+//                cutomAuthenticationProvider.authenticate(authenticationResult);
+//                chain.doFilter(request, httpResponse);
+//            }
+
+//        } catch (ServletException | IOException e) {
+        } catch (RuntimeException e) {
             SecurityContextHolder.getContext().setAuthentication(null);
             HttpServletResponse httpServletResponse = (HttpServletResponse) response;
             httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
             log.error("AuthenticationFilter doFilter error: {}", e.getMessage());
         }
+        chain.doFilter(request, response);
     }
 }

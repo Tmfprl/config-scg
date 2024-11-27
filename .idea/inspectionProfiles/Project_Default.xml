@@ -5,6 +5,7 @@
       <option name="customHeaders">
         <set>
           <option value="access-token" />
+          <option value="access_token" />
         </set>
       </option>
     </inspection_tool>

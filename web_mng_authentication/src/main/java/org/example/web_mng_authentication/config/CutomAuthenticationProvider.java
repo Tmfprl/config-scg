@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class CutomAuthenticationProvider implements AuthenticationProvider {
-    private final UserDetailsService userDetailsService;
+    private final UserApiService userDetailsService;
     BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
     private final UserApiService userApiService;
 
@@ -42,7 +42,7 @@ public class CutomAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("Password Not Match");
         } else {
             // 로그인 성공 후처리
-            userApiService.loginCallback(username, true, "");
+//            userApiService.loginCallback(username, true, "");
             // password에 null이 들어갈 수 없다.
             // 인증된 객체를 생성
             return new UsernamePasswordAuthenticationToken(username, password, null);

@@ -37,7 +37,8 @@ public class CustomAuthSuccessHandler implements AuthenticationSuccessHandler {
             log.info("login success");
             userApiService.loginCallback(userDetails.getUsername(), true, "");
             tokenProvider.createTokenAndAddHeader(response, authentication);
-//            System.out.println(response.getHeader("access-token"));
+            log.info("get access token in header : {}", response.getHeader("access-token"));
+            response.sendRedirect("/getUser/" + userDetails.getUsername());
         } else {
             log.info("login failed");
         }

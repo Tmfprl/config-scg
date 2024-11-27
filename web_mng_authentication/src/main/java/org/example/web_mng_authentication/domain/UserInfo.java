@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,12 +19,10 @@ import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
-@Entity
-@Table(name="gyeun_user_info", schema = "srlk")
-@ToString
-@Getter
-@DynamicInsert
-@DynamicUpdate
+@Slf4j
+@Entity @Table(name="gyeun_user_info", schema = "srlk")
+@ToString @Getter
+@DynamicInsert @DynamicUpdate
 @NoArgsConstructor
 public class UserInfo implements UserDetails {
 
@@ -104,6 +103,7 @@ public class UserInfo implements UserDetails {
      * @return User 사용자 엔티티
      */
     public UserInfo successLogin() {
+        log.info("login success");
         this.loginFailCount = 0;
         this.lastLoginDate = LocalDateTime.now();
         return this;

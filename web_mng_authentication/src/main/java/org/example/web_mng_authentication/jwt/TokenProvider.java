@@ -38,6 +38,7 @@ public class TokenProvider {
     private String TOKEN_REFRESH_TIME;
 
     final String TOKEN_ACCESS_KEY = "access-token";
+    final String TOKEN_REFRESH_KEY = "refresh-token";
     final String TOKEN_CLAIM_USER_NAME = "userName";
 
     public void createTokenAndAddHeader(HttpServletResponse response, Authentication authResult) throws IOException {
@@ -62,9 +63,9 @@ public class TokenProvider {
         String refreshToken = createRefreshToken();
         userService.updateRefreshToken(userId, refreshToken);
 
-        // 토큰을 헤더에 추가
+        // 기존 헤더에 추가하려는 것과 같은 키값이 없을 때에는 addHeader()나 setHeader()나 동일하게 동작한다.
         response.addHeader(TOKEN_ACCESS_KEY, accessToken);
-        response.sendRedirect("/getUser/userId=" + authResult.getName());
+        response.addHeader(TOKEN_REFRESH_KEY, refreshToken);
     }
 
 
@@ -127,8 +128,7 @@ public class TokenProvider {
             Jwts.parser().setSigningKey(TOKEN_SECRET).parseClaimsJws(token);
             log.info("token validate");
             return true;
-        } catch (JwtException e) {
-            // MalformedJwtException | ExpiredJwtException | IllegalArgumentException
+        } catch (MalformedJwtException | ExpiredJwtException | IllegalArgumentException e) {
             throw new ServiceCoustomException(ErrorCode.TOKEN_EXPIRED);
         }
     }

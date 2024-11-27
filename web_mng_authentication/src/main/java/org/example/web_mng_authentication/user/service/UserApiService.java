@@ -1,12 +1,11 @@
 package org.example.web_mng_authentication.user.service;
 
+import jakarta.servlet.FilterChain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.web_mng_authentication.domain.UserInfo;
 import org.example.web_mng_authentication.domain.UserRepository;
-import org.example.web_mng_authentication.jwt.TokenProvider;
 import org.example.web_mng_authentication.user.dto.UserInfoDto;
-import org.example.web_mng_authentication.user.dto.UserLoginRequestDto;
 import org.example.web_mng_authentication.user.dto.UserResponseAllDto;
 import org.example.web_mng_authentication.user.dto.UserResponseDto;
 import org.springframework.data.domain.Page;
@@ -51,9 +50,8 @@ public class UserApiService implements UserDetailsService {
         // Optional 객체가 값을 가지고 있다면 true, 값이 없다면 false 리턴
         if(result.isPresent()) {
             UserInfo user = result.get();
-            log.info("login request User information {}", user);
+//            log.info("login request User information {}", user);
             if (Boolean.TRUE.equals(successAt)) {
-                log.info("login success");
                 user.successLogin();
             } else {
                 log.info("login fail");
@@ -61,6 +59,14 @@ public class UserApiService implements UserDetailsService {
                 log.error(user.getLoginFailCount().toString());
             }
         }
+    }
+
+    public UserDetails userDetails(String username) throws UsernameNotFoundException {
+        UserInfo userInfo = userRepository.findByUserId(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
+        log.info("founding user info......");
+        return User.builder()
+                .username(userInfo.getUserId())
+                .build();
     }
 
     // user 정보를 entity로 받아 user로 반환해준다. UserDetails_spring security에서 사용자의 정보를 담는 인터페이스 이다.

@@ -1,7 +1,11 @@
 package org.example.web_mng_authentication.user.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.web_mng_authentication.exception.ServiceCoustomException;
+import org.example.web_mng_authentication.exception.response.ErrorCode;
 import org.example.web_mng_authentication.jwt.TokenProvider;
 import org.example.web_mng_authentication.user.dto.UserInfoDto;
 import org.example.web_mng_authentication.user.dto.UserResponseDto;
@@ -11,7 +15,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor // final이 선언된 모든 필드를 인자값으로 하는 생성자를 대신 생성하여, 빈을 생성자로 주입받게 한다.
@@ -32,7 +40,14 @@ public class UserApiController {
     }
 
     @GetMapping("/getUser/{userId}")
-    public ResponseEntity<Page<UserResponseDto>> getUser(@PathVariable("userId") String userId) throws Exception {
+    public ResponseEntity<Page<UserResponseDto>> getUser(@PathVariable String userId,
+                                                         HttpServletRequest request, HttpServletResponse response) throws Exception {
+        log.info("Authorization ::::::: "+request.getHeader("access_token"));
+
+        if(userApiService.findByUserId(userId) == null){
+            throw new ServiceCoustomException(ErrorCode.USER_NOT_FOUND, "NOT FOUND USER");
+        }
+//        userDetails = userApiService.loadUserByUsername(userId);
         log.info("get user information {}", userId);
         Pageable pageable = PageRequest.of(0, 50, Sort.by("userId"));
         return ResponseEntity.ok()
