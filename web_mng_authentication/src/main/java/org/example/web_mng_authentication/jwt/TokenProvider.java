@@ -102,7 +102,7 @@ public class TokenProvider {
      *
      * @return refresh token
      */
-    private String createRefreshToken() {
+    public String createRefreshToken() {
         return Jwts.builder()
                 .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(TOKEN_REFRESH_TIME)))
                 .signWith(SignatureAlgorithm.HS512, TOKEN_SECRET)

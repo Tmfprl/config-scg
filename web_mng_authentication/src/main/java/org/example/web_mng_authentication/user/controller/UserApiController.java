@@ -42,7 +42,8 @@ public class UserApiController {
     @GetMapping("/getUser/{userId}")
     public ResponseEntity<Page<UserResponseDto>> getUser(@PathVariable String userId,
                                                          HttpServletRequest request, HttpServletResponse response) throws Exception {
-        log.info("Authorization ::::::: "+request.getHeader("access_token"));
+        log.info(String.valueOf(request.getHeaderNames()));
+        log.info("Authorization ::::::: {}", request.getHeader("Authorization"));
 
         if(userApiService.findByUserId(userId) == null){
             throw new ServiceCoustomException(ErrorCode.USER_NOT_FOUND, "NOT FOUND USER");

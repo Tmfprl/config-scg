@@ -1,6 +1,5 @@
 package org.example.web_mng_authentication.user.service;
 
-import jakarta.servlet.FilterChain;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.web_mng_authentication.domain.UserInfo;
@@ -86,14 +85,13 @@ public class UserApiService implements UserDetailsService {
     }
 
     public Page<UserResponseDto> findById (String userId, Pageable pageable) throws Exception {
-        Page<UserInfo> entity = userRepository.findByUserName(userId, pageable);
+        Page<UserInfo> entity = userRepository.findByUserId(userId, pageable);
         Page<UserResponseDto> dto = new UserResponseDto().toPage(entity);
         return dto;
     }
 
     public UserResponseAllDto findByUserId(String userId) throws Exception {
         UserInfo entity = userRepository.findByUserId(userId).orElseThrow(() -> new UsernameNotFoundException("01"));
-
         return new UserResponseAllDto(entity);
     }
 

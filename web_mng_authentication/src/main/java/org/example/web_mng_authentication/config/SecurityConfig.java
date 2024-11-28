@@ -53,7 +53,7 @@ public class SecurityConfig {
 //                exceptionConfig
 //                        .authenticationEntryPoint(unauthorizedEntryPoint)
 //                        .accessDeniedHandler(accessDeniedHandler)
-//        ) // 401 403 관련 예외처리_나중에 예외처리할때 한번에 설정
+//        ) // 401 403 관련 예외처리
                 .formLogin(
                         (formLogin) -> formLogin
                                 .successHandler(customAuthSuccessHandler)
@@ -72,6 +72,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // 자동으로 요청이 나가는 url을 예외 처리 해준다(웹서비스에서 아이콘을 지정해주는 역할인데 아이콘 설정을 한게 없기때문에)
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()

@@ -122,7 +122,7 @@ public class UserInfo implements UserDetails {
 
     @Override
     public String getPassword() {
-        return "";
+        return userPassword;
     }
 
     @Override
