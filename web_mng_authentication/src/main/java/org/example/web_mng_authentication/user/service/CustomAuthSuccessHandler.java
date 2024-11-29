@@ -55,11 +55,9 @@ public class CustomAuthSuccessHandler implements AuthenticationSuccessHandler {
                 // 응답 헤더에 토큰 추가
                 response.setHeader("Authorization", "Bearer " + jwtToken);
 
-                // 상태 코드 설정
-                response.setStatus(HttpServletResponse.SC_OK);
-                // 메세지 설정
-                response.getWriter().write("{\"message\": \"Login successful\"}");
-                // 전달
+                // Json 응답 추가 _ 헤더 안될 수도 있으니까...
+                response.setContentType("application/json");
+                response.getWriter().write("{\"access-token\": \"" + jwtToken + "\", \"message\": \"Login successful\"}");
                 response.getWriter().flush();
 
 //                  userApiService.loginCallback(userDetails.getUsername(), true, "");
