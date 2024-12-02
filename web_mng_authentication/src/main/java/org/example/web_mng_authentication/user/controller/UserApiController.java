@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -66,6 +67,13 @@ public class UserApiController {
         log.info("createToken userId : {}", jwtToken);
     }
 
-//    @GetMapping("/")
+    @GetMapping("/loginSuccess")
+    public ResponseEntity<String> loginSuccess(@RequestBody String accessToken) throws Exception {
+        log.info("get token {}", accessToken);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .body(accessToken);
+    }
 
 }

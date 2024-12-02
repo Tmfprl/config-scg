@@ -128,9 +128,17 @@ public class TokenProvider {
             Jwts.parser().setSigningKey(TOKEN_SECRET).parseClaimsJws(token);
             log.info("token validate");
             return true;
-        } catch (MalformedJwtException | ExpiredJwtException | IllegalArgumentException e) {
-            throw new ServiceCoustomException(ErrorCode.TOKEN_EXPIRED);
+        } catch (ExpiredJwtException exception) {
+            log.info("token expired");
+            return false;   // 만료
+        } catch (JwtException exception) {
+            log.info("token not valid");
+            return false;   // 변조
+        } catch (Exception e) {
+            log.info("not expired exception");
+            return false;   // 그 외 token 오류
         }
+
     }
 
     /**
