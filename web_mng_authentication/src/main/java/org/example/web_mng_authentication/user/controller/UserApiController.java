@@ -2,12 +2,16 @@ package org.example.web_mng_authentication.user.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.web_mng_authentication.exception.ServiceCoustomException;
 import org.example.web_mng_authentication.exception.response.ErrorCode;
 import org.example.web_mng_authentication.jwt.TokenProvider;
 import org.example.web_mng_authentication.user.dto.UserInfoDto;
+import org.example.web_mng_authentication.user.dto.UserResponseAllDto;
 import org.example.web_mng_authentication.user.dto.UserResponseDto;
 import org.example.web_mng_authentication.user.service.UserApiService;
 import org.springframework.data.domain.Page;
@@ -18,6 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -74,6 +79,39 @@ public class UserApiController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .body(accessToken);
+    }
+
+
+    /**
+     * 사용자 ID를 받아 JWT 액세스 토큰을 생성하여 응답
+     *
+     * @param user_id 사용자 ID
+     * @return JWT 액세스 토큰을 포함한 AuthResponse 객체 반환
+     */
+    @GetMapping("/auth/signIn")
+    public ResponseEntity<?> createAuthenticationToken(@RequestParam String user_id) throws Exception {
+        log.info("access token response");
+        UserResponseAllDto userResponseAllDto = userApiService.findByUserId(user_id);
+        UserDetails userDetails = userApiService.userDetails(user_id);
+        if(Objects.isNull(userDetails)) {
+            throw new ServiceCoustomException(ErrorCode.USER_NOT_FOUND, "NOT FOUND USER");
+        }
+        String token = (tokenProvider.createAccessToken(userDetails.getUsername(),
+                    userResponseAllDto.getUserName(), userResponseAllDto.getEmail()));
+
+        return ResponseEntity.ok()
+                .body(new AuthResponse(token));
+    }
+
+    /**
+     * JWT 액세스 토큰을 포함하는 응답 객체
+     */
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    static class AuthResponse {
+        private String access_token;
+
     }
 
 }

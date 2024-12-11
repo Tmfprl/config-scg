@@ -35,9 +35,7 @@ create table dwu_user
     refresh_token      varchar(255) default NULL::character varying,
     user_state_code    varchar(20)  default '00'::character varying not null,
     last_login_date    timestamp,
-    login_fail_count   smallint     default 0                       not null,
-    kakao_id           varchar(100),
-    naver_id           varchar(100)
+    login_fail_count   smallint     default 0                       not null
 );
 
 comment on table dwu_user is '사용자';
@@ -56,8 +54,6 @@ comment on column dwu_user.email_addr is '이메일 주소';
 
 comment on column dwu_user.encrypted_password is '암호화된 비밀번호';
 
-comment on column dwu_user.role_id is '권한 ID';
-
 comment on column dwu_user.user_id is '사용자 ID';
 
 comment on column dwu_user.user_name is '사용자 이름';
@@ -69,7 +65,3 @@ comment on column dwu_user.user_state_code is '회원 상태 코드';
 comment on column dwu_user.last_login_date is '마지막 로그인 일시';
 
 comment on column dwu_user.login_fail_count is '로그인 실패 수';
-
-comment on column dwu_user.kakao_id is '카카오 ID';
-
-comment on column dwu_user.naver_id is '네이버 ID';

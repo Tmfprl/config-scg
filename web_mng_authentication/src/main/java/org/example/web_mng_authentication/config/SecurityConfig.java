@@ -1,5 +1,6 @@
 package org.example.web_mng_authentication.config;
 
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.example.web_mng_authentication.jwt.JwtTokenFilter;
@@ -8,6 +9,7 @@ import org.example.web_mng_authentication.user.service.CustomAuthSuccessHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -48,14 +50,17 @@ public class SecurityConfig {
                         .requestMatchers("/getUser/**").permitAll()
                         .anyRequest().authenticated()   // 제한된 접근, 그 외의 모든 요청은 인증이 필요합니다.
                 )
-                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
 //                .exceptionHandling((exceptionConfig) ->
 //                exceptionConfig
 //                        .authenticationEntryPoint(unauthorizedEntryPoint)
 //                        .accessDeniedHandler(accessDeniedHandler)
 //        ) // 401 403 관련 예외처리
+//                .addFilterAt(jsonAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(
                         (formLogin) -> formLogin
+                                .loginProcessingUrl("/login")
                                 .successHandler(customAuthSuccessHandler)
                 )
                 .logout(
