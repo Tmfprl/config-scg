@@ -130,6 +130,7 @@ KOREAN.ver
 - Spring Boot와 PostgreSQL을 기반으로 한 사용자 인증 및 JWT 기반 토큰 관리 서비스
 - 마이크로서비스 환경(Eureka) 지원
 - JWT 토큰 만료 및 갱신 기능 포함
+- `final_msa_service` 프로젝트 내 서비스로 포함
 
 ---
 
