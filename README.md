@@ -89,6 +89,15 @@ src/main/java/org/example/web_mng_authentication
 └─ user
 ```
 
+| 패키지         | 역할                         |
+| ----------- | -------------------------- |
+| `config`    | Spring 설정, DB 설정, JWT 설정 등 |
+| `domain`    | 엔티티 정의 (DB 테이블 매핑)         |
+| `exception` | 커스텀 예외 처리                  |
+| `jwt`       | JWT 토큰 생성, 검증 로직           |
+| `user`      | 사용자 관련 서비스, DTO, 컨트롤러      |
+
+
 ---
 
 ## 사용 방법
