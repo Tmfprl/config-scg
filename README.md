@@ -78,15 +78,15 @@ eureka:
 
 ---
 
-## 구조 예시
+## 구조 
 
 ```
-src/main/java/com/example/authentication
-├─ controller
-├─ service
-├─ repository
+src/main/java/org/example/web_mng_authentication
 ├─ config
-└─ model
+├─ domain
+├─ exception
+├─ jwt
+└─ user
 ```
 
 ---
