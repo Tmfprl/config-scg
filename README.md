@@ -9,6 +9,7 @@
 * User authentication and JWT-based token management service using **Spring Boot** and **PostgreSQL**
 * Supports **microservice architecture** with **Eureka**
 * Includes JWT **expiration** and **refresh** functionality
+* It is included as a service in the `final_msa_service` project.
 
 ---
 
