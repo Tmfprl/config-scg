@@ -1,4 +1,126 @@
-# Web Management Authentication Service
+# 🌐 Web Management Authentication Service
+
+**User Authentication Service built with Spring Boot**
+
+---
+
+## 🚀 Project Overview
+
+* User authentication and JWT-based token management service using **Spring Boot** and **PostgreSQL**
+* Supports **microservice architecture** with **Eureka**
+* Includes JWT **expiration** and **refresh** functionality
+
+---
+
+## ✨ Key Features
+
+* User authentication & authorization management
+* JWT token generation, verification, expiration, and refresh
+* User data management via PostgreSQL
+* Microservice support through Eureka service registration
+
+---
+
+## 🛠 Tech Stack
+
+**Backend:** Java, Spring Boot, Spring Data JPA
+**Database:** PostgreSQL
+**Cloud / Infra:** Eureka (Service Discovery)
+**Security:** JWT
+
+---
+
+## ⚙️ Configuration (`application.yml`)
+
+```yaml
+server:
+  port: 8083
+
+token:
+  expiration_time: 7200000
+  refresh_time: 86400000
+  secret: <YOUR_SECRET_KEY>
+
+spring:
+  application:
+    name: web_mng_authentication
+  datasource:
+    hikari:
+      auto-commit: false
+      connection-test-query: select 1
+      maximum-pool-size: 10
+      pool-name: MyHikariCP
+      driver-class-name: org.postgresql.Driver
+      jdbc-url: jdbc:postgresql://[HOST]:[PORT]/[DB_NAME]
+      username: [USERNAME]
+      password: [PASSWORD]
+  jpa:
+    show_sql: true
+    hibernate:
+      ddl-auto: none
+
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: trace
+
+eureka:
+  client:
+    register-with-eureka: true
+    disable-delta: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+```
+
+---
+
+## 🏗 Installation & Running
+
+1. Install **JDK 17** or higher
+2. Configure **PostgreSQL** and connect to the database
+3. Build the project using **Maven** or **Gradle**
+4. Run the SpringApplication:
+
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+
+   or via IDE
+
+---
+
+## 📁 Project Structure
+
+```
+src/main/java/org/example/web_mng_authentication
+├─ config      # Spring config, DB setup, JWT config
+├─ domain      # Entity definitions (DB tables)
+├─ exception   # Custom exception handling
+├─ jwt         # JWT token generation & verification
+└─ user        # User-related services, DTOs, controllers
+```
+
+---
+
+## ⚡ Usage
+
+* Test user **registration**, **login**, and **token issuance**
+* Verify **Eureka registration** for microservice communication
+
+---
+
+## ⚠️ Notes
+
+* Keep **JWT Secret Key** secure
+* Adjust **PostgreSQL connection info** for each environment
+
+---
+
+## 📄 License
+
+MIT License
+
+---
+KOREAN.ver
 
 **Spring Boot 기반 사용자 인증 서비스**
 
