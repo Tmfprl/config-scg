@@ -1,67 +1,110 @@
-add user infomatiotable
+# Web Management Authentication Service
 
-create table srlk.gyeun_user_info
-(
-    user_no       bigserial      not null,
-    user_password varchar(32) not null,
-    user_name varchar(50) default NULL::character varying,
-    email         varchar(100) ,
-    creates_date  timestamp,
-    last_modified_by varchar(100) not null,
-    user_id       varchar(32) not null,
-    constraint gyeun_user_info_pk PRIMARY KEY (user_no)
+**Spring Boot 기반 사용자 인증 서비스**
 
-);
+---
 
-refernaces table 
+## 프로젝트 개요
+- Spring Boot와 PostgreSQL을 기반으로 한 사용자 인증 및 JWT 기반 토큰 관리 서비스
+- 마이크로서비스 환경(Eureka) 지원
+- JWT 토큰 만료 및 갱신 기능 포함
 
--- auto-generated definition
-create table dwu_user
-(
-    user_no            bigserial
-        constraint pk_dwu_user
-            primary key,
-    created_date       timestamp,
-    modified_date      timestamp,
-    created_by         varchar(255) default NULL::character varying,
-    last_modified_by   varchar(255) default NULL::character varying,
-    email_addr         varchar(100)                                 not null,
-    encrypted_password varchar(100) default NULL::character varying,
-    role_id            varchar(20)                                  not null,
-    user_id            varchar(255)                                 not null
-        constraint uk_dwu_user_01
-            unique,
-    user_name          varchar(50)                                  not null,
-    refresh_token      varchar(255) default NULL::character varying,
-    user_state_code    varchar(20)  default '00'::character varying not null,
-    last_login_date    timestamp,
-    login_fail_count   smallint     default 0                       not null
-);
+---
 
-comment on table dwu_user is '사용자';
+## 주요 기능
+- 사용자 인증 및 권한 관리
+- JWT 토큰 생성/검증, 만료 및 갱신
+- PostgreSQL 연동 사용자 데이터 관리
+- Eureka 서버 등록을 통한 마이크로서비스 환경 지원
 
-comment on column dwu_user.user_no is '사용자 번호';
+---
 
-comment on column dwu_user.created_date is '생성 일시';
+## 기술 스택
+- **Backend:** Java, Spring Boot, Spring Data JPA
+- **Database:** PostgreSQL
+- **Cloud / Infra:** Eureka (Service Discovery)
+- **Security:** JWT
 
-comment on column dwu_user.modified_date is '수정 일시';
+---
 
-comment on column dwu_user.created_by is '생성자 ID';
+## 환경 설정 (application.yml)
+```yaml
+server:
+  port: 8083
 
-comment on column dwu_user.last_modified_by is '수정자 ID';
+token:
+  expiration_time: 7200000
+  refresh_time: 86400000
+  secret: <YOUR_SECRET_KEY>
 
-comment on column dwu_user.email_addr is '이메일 주소';
+spring:
+  application:
+    name: web_mng_authentication
+  datasource:
+    hikari:
+      auto-commit: false
+      connection-test-query: select 1
+      maximum-pool-size: 10
+      pool-name: MyHikariCP
+      driver-class-name: org.postgresql.Driver
+      jdbc-url: jdbc:postgresql://[HOST]:[PORT]/[DB_NAME]
+      username: [USERNAME]
+      password: [PASSWORD]
+  jpa:
+    show_sql: true
+    hibernate:
+      ddl-auto: none
 
-comment on column dwu_user.encrypted_password is '암호화된 비밀번호';
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: trace
 
-comment on column dwu_user.user_id is '사용자 ID';
+eureka:
+  client:
+    register-with-eureka: true
+    disable-delta: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+````
 
-comment on column dwu_user.user_name is '사용자 이름';
+---
 
-comment on column dwu_user.refresh_token is 'refresh token';
+## 설치 및 실행
 
-comment on column dwu_user.user_state_code is '회원 상태 코드';
+1. JDK 17 이상 설치
+2. PostgreSQL 설정 후 DB 연결
+3. Maven 또는 Gradle 빌드
+4. SpringApplication 실행 (`./mvnw spring-boot:run` 또는 IDE 실행)
 
-comment on column dwu_user.last_login_date is '마지막 로그인 일시';
+---
 
-comment on column dwu_user.login_fail_count is '로그인 실패 수';
+## 구조 예시
+
+```
+src/main/java/com/example/authentication
+├─ controller
+├─ service
+├─ repository
+├─ config
+└─ model
+```
+
+---
+
+## 사용 방법
+
+* 사용자 등록, 로그인, 토큰 발급 테스트 가능
+* Eureka 등록 여부 확인 후 마이크로서비스 환경에서 통신 가능
+
+---
+
+## 주의사항
+
+* JWT Secret Key는 외부에 노출되지 않도록 관리
+* PostgreSQL 접속 정보는 환경별로 맞게 수정 필요
+
+---
+
+## 라이선스
+
+MIT License
